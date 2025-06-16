@@ -24,12 +24,15 @@ url: "https://modern-css.davecross.co.uk/"
 baseurl: ""
 
 email: hello@davecross.co.uk
-twitter_username: jekyllrb
 github_username:  davorg
 
-theme: "minimal-mistakes-jekyll"
+remote-theme: "mmistakes/minimal-mistakes"
 plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
   - jekyll-include-cache
+  - jekyll-remote-theme
 
 # Minimal Mistakes Settings
 minimal_mistakes_skin: "default"
