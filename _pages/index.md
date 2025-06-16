@@ -24,7 +24,7 @@ Each day, we'll have a new article about a CSS feature that has been added
 since I stopped taking notice about twenty years ago. There's an RSS feed for
 those of you old enough to remember web feeds.
 
-I build this purely for me. But I guess there's a good chance that others
+I built this purely for me. But I guess there's a good chance that others
 might be in the same situation. Let me know if you find it useful too.
 
 Cheers,
