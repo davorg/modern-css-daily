@@ -47,6 +47,8 @@ kramdown:
 seo:
   canonical_url: https://modern-css.davecross.co.uk/
 
+permalink: /:year/:month/:day/:title/
+
 # Site author
 author:
   name: "Dave Cross"
