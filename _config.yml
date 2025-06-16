@@ -54,6 +54,12 @@ author:
   name: "Dave Cross"
   avatar: "/assets/images/avatar.png"  # Optional
 
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-github"
+      url: "https://github.com/davorg/modern-css-daily"
+
 # Build settings
 exclude: ["bin", "data"]
 
