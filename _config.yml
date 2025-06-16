@@ -31,11 +31,21 @@ plugins:
   - jekyll-include-cache
   - jekyll-remote-theme
   - jekyll-seo-tag
+  - jekyll-feed
+  - jekyll-sitemap
 
 # Minimal Mistakes Settings
 minimal_mistakes_skin: "default"
 markdown: kramdown
 highlighter: rouge
+
+kramdown:
+  input: GFM
+  hard_wrap: false
+  auto_ids: true
+
+seo:
+  canonical_url: https://modern-css.davecross.co.uk/
 
 # Site author
 author:
