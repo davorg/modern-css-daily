@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+use v5.36;
+use JSON::PP;
+use Path::Tiny;
+use DateTime;
+use OpenAPI::Client::OpenAI;
+
+my $date = DateTime->now->ymd;  # today's date
+my $posts_dir = path("_posts");
+my $covered_file = path("data/covered-features.json");
+$covered_file->touchpath;
+
+# Load existing covered features
+my $covered = eval { decode_json($covered_file->slurp_utf8) } // [];
+
+# Step 1: Ask OpenAI for a new feature
+my $client = OpenAPI::Client::OpenAI->new();
+
+my $excluded = join ", ", map { qq["$_"] } @$covered;
+my $feature_prompt = <<"PROMPT";
+Give me the name of a single CSS feature introduced in the last 20 years that is NOT in this list:
+[$excluded]
+Only return the feature name, no explanation or formatting.
+PROMPT
+
+my $tx = $client->createChatCompletion({
+  body => {
+    model => "gpt-4o",
+    messages => [
+      { role => "system", content => "You are a CSS expert." },
+      { role => "user", content => $feature_prompt }
+    ]
+  }
+});
+
+my $response = $tx->res->json;
+
+use Data::Printer;
+p $response;
+
+my $feature = $response->{choices}[0]{message}{content};
+$feature =~ s/^[^a-zA-Z0-9]*//;
+$feature =~ s/[^a-zA-Z0-9-()]+$//;
+die "No valid feature returned" unless $feature;
+
+# Step 2: Ask OpenAI for a blog post
+my $post_prompt = <<"PROMPT";
+Write a 400-word blog post for web developers explaining the CSS feature "$feature".
+Include:
+- When it was introduced
+- What it does
+- Example usage with code
+- Why it's useful today
+- Caveats or browser support
+Do not include a title; just the article content.
+PROMPT
+
+my $tx2 = $client->createChatCompletion({
+  body => {
+    model => "gpt-4o",
+    messages => [
+      { role => "system", content => "You are a technical writer for a blog about modern CSS." },
+      { role => "user", content => $post_prompt }
+    ]
+  }
+});
+
+my $post_response = $tx2->res->json;
+my $content = $post_response->{choices}[0]{message}{content};
+$content =~ s/\r//g;
+
+# Step 3: Save the post
+my $slug = lc($feature);
+$slug =~ s/[^a-z0-9]+/-/g;
+$slug =~ s/^-|-$//g;
+
+my $filename = "${date}-$slug.md";
+my $post_path = $posts_dir->child($filename);
+
+my $front_matter = <<"FM";
+---
+title: "$feature"
+date: $date
+categories: ["CSS"]
+tags: [$feature]
+layout: single
+---
+FM
+
+$post_path->spew_utf8("$front_matter\n$content\n");
+
+# Step 4: Update the covered features list
+push @$covered, $feature;
+$covered_file->spew_utf8(encode_json($covered));
+
+say "✅ Created post: $post_path";
+

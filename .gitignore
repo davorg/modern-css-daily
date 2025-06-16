@@ -1,0 +1,27 @@
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+
+_site/
+vendor/
+*.swp
+*.bak
+.DS_Store
+
+# Perl-related
+*.tar.gz
+*.o
+*.bs
+*.pm~
+Build/
+blib/
+cover_db/
+nytprof.out
+
+# cpanm
+.local/
+cpanfile.snapshot
+
+# Ruby
+.bundle/
+

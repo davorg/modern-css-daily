@@ -1,0 +1,37 @@
+name: Daily CSS Post
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # every day at 3am UTC
+  workflow_dispatch:      # allow manual runs
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.36'
+
+      - name: Install dependencies
+        run: |
+          cpanm --quiet --installdeps .
+
+      - name: Generate today's post
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: bin/generate_post
+
+      - name: Commit and push if there are changes
+        run: |
+          git config user.name "css-bot"
+          git config user.email "css-bot@example.com"
+          git add _posts/ data/covered-features.json
+          git commit -m "🤖 Daily CSS post for $(date -I)" || echo "No changes to commit"
+          git push
+
