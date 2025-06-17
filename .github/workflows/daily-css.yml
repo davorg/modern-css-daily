@@ -5,6 +5,9 @@ on:
     - cron: "0 3 * * *"  # every day at 3am UTC
   workflow_dispatch:      # allow manual runs
 
+permissions:
+  contents: write
+
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -20,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cpanm --quiet --installdeps .
+          cpanm --notest --installdeps .
 
       - name: Generate today's post
         env:
@@ -34,4 +37,6 @@ jobs:
           git add _posts/ data/covered-features.json
           git commit -m "🤖 Daily CSS post for $(date -I)" || echo "No changes to commit"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
