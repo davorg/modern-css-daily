@@ -5,6 +5,8 @@ permalink: /
 author_profile: false
 ---
 
+![Dave Cross](/img/dc-css.png)
+
 Every year I take the [State of CSS](https://stateofcss.com/en-US) survey.
 
 And every year, I'm reminded that the vast majority of my CSS knowledge is

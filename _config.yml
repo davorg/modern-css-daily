@@ -49,6 +49,9 @@ analytics:
   google:
     tracking_id: "G-V6BJ2XKPNW"
 
+logo: img/dc-css-sq.png
+og_image: /img/dc-css.png
+
 seo:
   canonical_url: https://modern-css.davecross.co.uk/
 
