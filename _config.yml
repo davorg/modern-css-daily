@@ -53,7 +53,7 @@ logo: img/dc-css-sq.png
 og_image: /img/dc-css.png
 
 seo:
-  canonical_url: https://modern-css.davecross.co.uk/
+  canonical_url: https://modern-css.davecross.co.uk
 
 permalink: /:year/:month/:day/:title/
 
