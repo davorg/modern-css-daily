@@ -79,3 +79,8 @@ collections:
     output: true
     permalink: /:path/
 
+defaults:
+  - scope:
+      path: ""
+    values:
+      seo_description_max_words: 20
