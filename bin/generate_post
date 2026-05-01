@@ -4,6 +4,7 @@ use JSON::PP;
 use Path::Tiny;
 use DateTime;
 use OpenAPI::Client::OpenAI;
+use Data::Printer;
 
 my $date = DateTime->now->ymd;  # today's date
 my $posts_dir = path("_posts");
@@ -33,9 +34,13 @@ my $tx = $client->createChatCompletion({
   }
 });
 
+if ($res->error) {
+  p $res->res->json;
+  exit 1;
+}
+
 my $response = $tx->res->json;
 
-use Data::Printer;
 p $response;
 
 my $feature = $response->{choices}[0]{message}{content};
