@@ -34,8 +34,8 @@ my $tx = $client->createChatCompletion({
   }
 });
 
-if ($res->error) {
-  p $res->res->json;
+if ($tx->error) {
+  p $tx->res->json;
   exit 1;
 }
 
