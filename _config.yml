@@ -73,9 +73,6 @@ footer:
     - label: "GitHub"
       icon: "fab fa-github"
       url: "https://github.com/davorg/modern-css-daily"
-    - label: "RSS"
-      icon: "fas fa-rss"
-      url: "/feed.xml"
 
 # Build settings
 exclude: ["bin", "data"]
