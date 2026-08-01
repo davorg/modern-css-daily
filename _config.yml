@@ -64,6 +64,9 @@ author:
 
 footer:
   links:
+    - label: "Support Modern CSS Daily"
+      icon: "fas fa-mug-hot"
+      url: "https://ko-fi.com/davorg"
     - label: "Made by Dave Cross"
       icon: "fa-solid fa-user"
       url: "https://links.davecross.co.uk/"
