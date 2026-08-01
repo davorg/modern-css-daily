@@ -8,9 +8,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: daily-css-post
+  cancel-in-progress: false
+
 jobs:
   generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -35,8 +40,11 @@ jobs:
           git config user.name "css-bot"
           git config user.email "css-bot@example.com"
           git add _posts/ data/covered-features.json
-          git commit -m "🤖 Daily CSS post for $(date -I)" || echo "No changes to commit"
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "🤖 Daily CSS post for $(date -u -I)"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

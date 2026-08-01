@@ -1,102 +1,182 @@
 #!/usr/bin/env perl
 use v5.36;
-use JSON::PP;
+use JSON::PP qw(decode_json encode_json);
 use Path::Tiny;
 use DateTime;
+use HTTP::Tiny;
 use OpenAPI::Client::OpenAI;
-use Data::Printer;
 
-my $date = DateTime->now->ymd;  # today's date
-my $posts_dir = path("_posts");
-my $covered_file = path("data/covered-features.json");
+my $date         = DateTime->now(time_zone => 'UTC')->ymd;
+my $posts_dir    = path('_posts');
+my $covered_file = path('data/covered-features.json');
+my $model        = $ENV{OPENAI_MODEL} // 'gpt-5.6';
+
+$posts_dir->mkpath;
 $covered_file->touchpath;
 
-# Load existing covered features
 my $covered = eval { decode_json($covered_file->slurp_utf8) } // [];
+die "$covered_file must contain a JSON array\n" unless ref $covered eq 'ARRAY';
 
-# Step 1: Ask OpenAI for a new feature
+my %covered_key = map { normalise_feature($_) => 1 } @$covered;
+my $excluded = join "\n", map { "- $_" } @$covered;
 my $client = OpenAPI::Client::OpenAI->new();
 
-my $excluded = join ", ", map { qq["$_"] } @$covered;
-my $feature_prompt = <<"PROMPT";
-Give me the name of a single CSS feature introduced in the last 20 years that is NOT in this list:
-[$excluded]
-Only return the feature name, no explanation or formatting.
+my ($feature, $spec_url);
+ATTEMPT:
+for my $attempt (1 .. 5) {
+  my $prompt = <<"PROMPT";
+Choose one real CSS feature introduced or substantially standardised in the last 20 years.
+
+Requirements:
+- It must be explicitly defined by a current W3C CSS specification or CSS Working Group editor's draft.
+- Return its canonical CSS name: an exact property, at-rule, selector, function, unit, media feature, or named specification feature.
+- Do not invent a variation of an existing feature.
+- Do not choose the same feature under different punctuation, spacing, capitalisation, aliases, or closely related wording.
+- The spec URL must be an https URL on w3.org/TR/ or drafts.csswg.org and its page must contain the canonical name.
+
+Already covered:
+$excluded
 PROMPT
 
-my $tx = $client->createChatCompletion({
-  body => {
-    model => "gpt-4o",
+  my $response = chat($client, {
+    model => $model,
     messages => [
-      { role => "system", content => "You are a CSS expert." },
-      { role => "user", content => $feature_prompt }
-    ]
-  }
-});
+      { role => 'system', content => 'You are a meticulous CSS standards editor. Accuracy is more important than novelty.' },
+      { role => 'user', content => $prompt },
+    ],
+    response_format => {
+      type => 'json_schema',
+      json_schema => {
+        name => 'css_feature',
+        strict => JSON::PP::true,
+        schema => {
+          type => 'object',
+          properties => {
+            feature  => { type => 'string' },
+            spec_url => { type => 'string' },
+          },
+          required => [qw(feature spec_url)],
+          additionalProperties => JSON::PP::false,
+        },
+      },
+    },
+  });
 
-if ($tx->error) {
-  p $tx->res->json;
-  exit 1;
+  my $candidate = eval { decode_json($response) };
+  unless ($candidate && ref $candidate eq 'HASH') {
+    warn "Attempt $attempt returned invalid JSON\n";
+    next ATTEMPT;
+  }
+
+  ($feature, $spec_url) = @{$candidate}{qw(feature spec_url)};
+  $feature  = clean_text($feature // '');
+  $spec_url = clean_text($spec_url // '');
+
+  unless ($feature && !$covered_key{normalise_feature($feature)}) {
+    warn "Attempt $attempt returned an empty or already-covered feature: $feature\n";
+    next ATTEMPT;
+  }
+
+  unless (valid_spec_reference($feature, $spec_url)) {
+    warn "Attempt $attempt returned an unverifiable specification reference: $spec_url\n";
+    next ATTEMPT;
+  }
+
+  last ATTEMPT;
 }
 
-my $response = $tx->res->json;
+die "Could not find a new, verifiable CSS feature after 5 attempts\n"
+  unless $feature && $spec_url;
 
-p $response;
-
-my $feature = $response->{choices}[0]{message}{content};
-$feature =~ s/^[^a-zA-Z0-9]*//;
-$feature =~ s/[^a-zA-Z0-9-()]+$//;
-die "No valid feature returned" unless $feature;
-
-# Step 2: Ask OpenAI for a blog post
 my $post_prompt = <<"PROMPT";
-Write a 400-word blog post for web developers explaining the CSS feature "$feature".
+Write a concise blog post of about 400 words for web developers explaining the CSS feature "$feature".
+
+Use this specification as the source of truth: $spec_url
+
 Include:
-- When it was introduced
-- What it does
-- Example usage with code
-- Why it's useful today
-- Caveats or browser support
-Do not include a title; just the article content.
+- what the feature does and its standards status, without inventing a precise introduction date
+- a minimal, valid code example using current syntax
+- why it is useful today
+- honest caveats; do not guess browser versions or support percentages
+- a final "Further reading" link to the specification URL
+
+Do not include a title or YAML front matter. Do not describe syntax that is absent from the cited specification.
 PROMPT
 
-my $tx2 = $client->createChatCompletion({
-  body => {
-    model => "gpt-4o",
-    messages => [
-      { role => "system", content => "You are a technical writer for a blog about modern CSS." },
-      { role => "user", content => $post_prompt }
-    ]
-  }
+my $content = chat($client, {
+  model => $model,
+  messages => [
+    { role => 'system', content => 'You are a careful technical writer. Never invent CSS syntax or browser support claims.' },
+    { role => 'user', content => $post_prompt },
+  ],
 });
-
-my $post_response = $tx2->res->json;
-my $content = $post_response->{choices}[0]{message}{content};
 $content =~ s/\r//g;
+die "The generated article does not cite its specification\n"
+  unless index($content, $spec_url) >= 0;
 
-# Step 3: Save the post
-my $slug = lc($feature);
+my $slug = lc $feature;
 $slug =~ s/[^a-z0-9]+/-/g;
 $slug =~ s/^-|-$//g;
+die "Could not create a slug for $feature\n" unless $slug;
 
-my $filename = "${date}-$slug.md";
-my $post_path = $posts_dir->child($filename);
+my $post_path = $posts_dir->child("${date}-$slug.md");
+die "$post_path already exists; refusing to overwrite today's post\n" if $post_path->exists;
 
+(my $yaml_title = $feature) =~ s/(["\\])/\\$1/g;
 my $front_matter = <<"FM";
 ---
-title: "$feature"
+title: "$yaml_title"
 date: $date
 categories: ["CSS"]
-tags: [$feature]
+tags: ["$yaml_title"]
 layout: single
+source: "$spec_url"
 ---
 FM
 
 $post_path->spew_utf8("$front_matter\n$content\n");
-
-# Step 4: Update the covered features list
 push @$covered, $feature;
 $covered_file->spew_utf8(encode_json($covered));
 
-say "✅ Created post: $post_path";
+say "Created post: $post_path";
 
+sub chat ($client, $body) {
+  my $tx = $client->createChatCompletion({ body => $body });
+  if ($tx->error) {
+    my $error = eval { encode_json($tx->res->json) } // $tx->error;
+    die "OpenAI API request failed: $error\n";
+  }
+
+  my $json = $tx->res->json;
+  my $text = $json->{choices}[0]{message}{content};
+  die "OpenAI API returned no content\n" unless defined $text && length $text;
+  return $text;
+}
+
+sub clean_text ($text) {
+  $text =~ s/^\s+|\s+$//g;
+  return $text;
+}
+
+sub normalise_feature ($text) {
+  $text = lc clean_text($text // '');
+  $text =~ s/^css\s+//;
+  $text =~ s/\b(?:property|function|pseudo-class|selector|at-rule|feature)\b//g;
+  $text =~ s/[^a-z0-9]+//g;
+  return $text;
+}
+
+sub valid_spec_reference ($feature, $url) {
+  return 0 unless $url =~ m{\Ahttps://(?:www\.)?w3\.org/TR/|\Ahttps://drafts\.csswg\.org/}i;
+
+  my $response = HTTP::Tiny->new(
+    agent => 'modern-css-daily/1.0',
+    timeout => 20,
+    verify_SSL => 1,
+  )->get($url);
+  return 0 unless $response->{success};
+
+  my $needle = lc $feature;
+  $needle =~ s/\(\)//g;
+  return index(lc($response->{content} // ''), $needle) >= 0;
+}
