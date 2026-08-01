@@ -6,28 +6,18 @@ tags: [accent-color-suppress]
 layout: single
 ---
 
-In the ever-evolving landscape of web development, CSS continues to introduce features that enhance both developer experience and user interfaces. One such feature, introduced relatively recently, is `accent-color-suppress`. Emerging around 2023, this property addresses nuanced needs in customizing the appearance of form elements across different web browsers.
+> **Correction — 1 August 2026:** The original version of this article described `accent-color-suppress` as a CSS feature. That was incorrect, so the erroneous article has been replaced.
 
-The `accent-color-suppress` property is essentially used in combination with the `accent-color` property. Its primary function is to prevent the default accent color's influence over certain form elements. Before diving into its use, it’s essential to understand `accent-color`. This CSS property allows developers to specify a color to be used by default controls across their website, like checkboxes, radio buttons, and potentially other UI components. It harmonizes the appearance of these elements across different browsers and user settings.
+CSS defines the [`accent-color`](https://www.w3.org/TR/css-ui-4/#widget-accent) property; it does not define a separate `accent-color-suppress` property, function, selector, or media query.
 
-To give a practical example, let’s assume you want your radio buttons to exhibit a specific accent color, but only in certain scenarios or for specific parts of a form. Here’s how you might use these CSS properties:
+The valid syntax is `accent-color: auto` or `accent-color: <color>`. It lets a browser use the chosen colour for accented parts of applicable user-interface controls, such as checkboxes and radio buttons:
 
 ```css
-/* Set a universal accent color */
-.accented-form {
-  accent-color: #ff4500; /* Example color */
-}
-
-/* Suppress the accent color for a specific section or element */
-.no-accent {
-  accent-color-suppress: transparent;
+:root {
+  accent-color: rebeccapurple;
 }
 ```
 
-In the code above, the `.accented-form` class applies a distinct accent color across form elements. However, applying the `.no-accent` class to any specific element or section would revert those form elements to their default styling, effectively ignoring the declared `accent-color`.
+The browser remains responsible for rendering the control and maintaining legibility. It may adjust the supplied colour or related foreground colours to preserve contrast. Authors should therefore not assume exact cross-platform rendering.
 
-The utility of `accent-color-suppress` lies in its ability to provide granular control over the appearance consistency across different components of a form or page. This granular control can improve both UX and accessibility, ensuring that the design remains balanced and intentional, even within dynamically styled applications.
-
-Despite its promise, developers should cautiously integrate this property due to potential caveats with browser support. As with many CSS features introduced recently, `accent-color-suppress` might not be uniformly supported across all browsers yet, since CSS specifications continuously evolve and take time to be adopted by major browser engines. Therefore, it’s crucial to conduct compatibility checks, particularly leveraging tools like Can I Use or testing in several browsers manually to ensure a seamless user experience.
-
-In conclusion, `accent-color-suppress` offers web developers enhanced flexibility and control when styling form elements, which can lead to a more polished and coherent UI. However, given its current stage, careful testing and fallback provisions are advisable to cater to a wider range of users.
+Further reading: [CSS Basic User Interface Module Level 4](https://www.w3.org/TR/css-ui-4/#widget-accent).

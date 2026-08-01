@@ -6,30 +6,18 @@ tags: [accent-color-swatch]
 layout: single
 ---
 
-In the ever-evolving landscape of CSS, staying updated with the latest features is crucial for web developers aiming to create accessible and visually appealing web applications. One such feature that has garnered attention for its ability to enhance user interface customization is the `accent-color-swatch`. Introduced in the CSS Color Module Level 5, this feature empowers developers to have greater control over color theming, streamlining the process of applying consistent accent colors across various UI elements.
+> **Correction — 1 August 2026:** The original version of this article described `accent-color-swatch` as a CSS feature. That was incorrect, so the erroneous article has been replaced.
 
-The essence of `accent-color-swatch` lies in its ability to define a color that harmonizes with the overall theme of the user interface, specifically for controls like checkboxes, radio buttons, and ranges. Unlike the more general `accent-color`, which sets the accent color for form elements, `accent-color-swatch` offers a swatch of colors from which the browser can select the closest matching color for these elements. This functionality allows developers to ensure a semblance of consistency, even if the exact color cannot be rendered due to hardware or platform limitations.
+CSS defines the [`accent-color`](https://www.w3.org/TR/css-ui-4/#widget-accent) property; it does not define a separate `accent-color-swatch` property, function, selector, or media query.
 
-Here's a simple example demonstrating how you can use `accent-color-swatch`:
+The valid syntax is `accent-color: auto` or `accent-color: <color>`. It lets a browser use the chosen colour for accented parts of applicable user-interface controls, such as checkboxes and radio buttons:
 
 ```css
 :root {
-  --primary-accent: #3498db;
-  --secondary-accent: #9b59b6;
-}
-
-body {
-  accent-color-swatch: var(--primary-accent), var(--secondary-accent);
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  background-color-swatch: var(--primary-accent);
+  accent-color: rebeccapurple;
 }
 ```
 
-In this example, two colors are specified as part of the swatch, allowing the user agent to pick a suitable accent color. The flexibility of `accent-color-swatch` is particularly useful for developers working on applications with themes that change dynamically or are built to respect the user's system theme settings. Having a cascading swatch of accent colors enables better adaptability in such situations.
+The browser remains responsible for rendering the control and maintaining legibility. It may adjust the supplied colour or related foreground colours to preserve contrast. Authors should therefore not assume exact cross-platform rendering.
 
-Today, the usefulness of `accent-color-swatch` lies in its enhancement of the native look and feel of controls while ensuring they conform to the chosen color scheme, improving user experience by maintaining visual consistency. It becomes particularly significant when you’re striving for accessibility, ensuring that controls are visually distinguishable yet cohesive with the overall design.
-
-However, like any new CSS feature, there are caveats around browser support. As of the latest updates, `accent-color-swatch` sees limited support predominantly in browsers adhering closely to the new specifications, meaning its use in production should be accompanied by appropriate fallbacks for browsers that may not yet recognize the property. Testing on a wide array of devices remains a best practice to ensure broader compatibility. Nevertheless, as more browsers begin to incorporate CSS Level 5 features, `accent-color-swatch` promises to become a staple CSS tool in the developer's toolkit for crafting visually consistent and accessible web design.
+Further reading: [CSS Basic User Interface Module Level 4](https://www.w3.org/TR/css-ui-4/#widget-accent).

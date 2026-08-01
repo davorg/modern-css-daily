@@ -6,46 +6,18 @@ tags: [accent-color-name]
 layout: single
 ---
 
-As web design continues to evolve, creating visually appealing interfaces with minimal code has become increasingly important. Introduced in 2022, the CSS feature `accent-color` offers a streamlined way to control the colors of form elements’ accents. This property allows developers to specify a color that can be used by the User Agent (browser) to paint certain user-interface styles, enhancing accessibility and theming coherence with less effort.
+> **Correction — 1 August 2026:** The original version of this article described `accent-color-name` as a CSS feature. That was incorrect, so the erroneous article has been replaced.
 
-The `accent-color` property targets common UI elements like checkboxes, radio buttons, range sliders, and progress bars. Traditionally, customizing these elements required intricate CSS or JavaScript hacks, often resulting in inconsistent styling across different browsers. With `accent-color`, developers can effortlessly specify a color that the browser then applies, ensuring a level of uniformity and simplicity.
+CSS defines the [`accent-color`](https://www.w3.org/TR/css-ui-4/#widget-accent) property; it does not define a separate `accent-color-name` property, function, selector, or media query.
 
-Here’s a simple example to illustrate `accent-color` in action:
+The valid syntax is `accent-color: auto` or `accent-color: <color>`. It lets a browser use the chosen colour for accented parts of applicable user-interface controls, such as checkboxes and radio buttons:
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        input {
-            accent-color: #08c;
-        }
-    </style>
-</head>
-<body>
-    <form>
-        <label>
-            <input type="checkbox" name="subscribe">
-            Subscribe to newsletter
-        </label>
-        <br>
-        <label>
-            <input type="radio" name="gender" value="male"> Male
-        </label>
-        <label>
-            <input type="radio" name="gender" value="female"> Female
-        </label>
-    </form>
-</body>
-</html>
+```css
+:root {
+  accent-color: rebeccapurple;
+}
 ```
 
-In this example, the `accent-color` property sets the accent color for checkboxes and radio buttons to a calming blue defined as `#08c`. This not only enhances the look of the form elements but ensures consistency across various platforms and devices with very little code.
+The browser remains responsible for rendering the control and maintaining legibility. It may adjust the supplied colour or related foreground colours to preserve contrast. Authors should therefore not assume exact cross-platform rendering.
 
-Today, `accent-color` is particularly useful in design systems and component libraries where maintaining a consistent color scheme is crucial. No longer do developers need to override complex default styles or depend on unreliable hacks to modify the appearance of form elements.
-
-That said, `accent-color` is not a silver bullet. As with most CSS properties, browser support is a crucial consideration. At the time of its introduction, `accent-color` had wide adoption across modern browsers, including the latest versions of Chrome, Edge, and Firefox. However, developers should be cautious if supporting legacy browsers is a requirement, as not all older browsers may render this property.
-
-Overall, `accent-color` makes it simpler to marry style and functionality, drastically reducing the complexity for developers working on modern web applications. With this tool, designers can hone the aesthetics of UI elements and developers can focus more on key functionalities, enhancing productivity and ensuring the web is a more beautiful place.
+Further reading: [CSS Basic User Interface Module Level 4](https://www.w3.org/TR/css-ui-4/#widget-accent).

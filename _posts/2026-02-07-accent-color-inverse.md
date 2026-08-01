@@ -6,33 +6,18 @@ tags: [accent-color-inverse]
 layout: single
 ---
 
-In the ever-evolving world of web development, CSS continues to unveil features that enhance both design and user experience. One such novel addition is the `accent-color-inverse` property, which was introduced as part of the CSS Color Module Level 5 specification. While still in its early stages, this feature represents a promising advance in creating aesthetically coherent web designs.
+> **Correction — 1 August 2026:** The original version of this article described `accent-color-inverse` as a CSS feature. That was incorrect, so the erroneous article has been replaced.
 
-The `accent-color-inverse` property allows developers to specify an inverse color that contrasts well with the `accent-color`, which is used to style UI elements such as checkboxes, radio buttons, and progress bars. The need for a contrasting accent color is crucial for improving readability and ensuring that UI elements stand out, especially for accessibility purposes.
+CSS defines the [`accent-color`](https://www.w3.org/TR/css-ui-4/#widget-accent) property; it does not define a separate `accent-color-inverse` property, function, selector, or media query.
 
-Imagine you have set an `accent-color` of a dark blue for your buttons. In some contexts, you might need a lighter, contrasting color to ensure that text or icons are legible on those controls. This is where `accent-color-inverse` becomes invaluable, allowing you to define a color that pairs harmoniously with your chosen accent color.
-
-Here is a simple example of how `accent-color-inverse` might be used:
+The valid syntax is `accent-color: auto` or `accent-color: <color>`. It lets a browser use the chosen colour for accented parts of applicable user-interface controls, such as checkboxes and radio buttons:
 
 ```css
 :root {
-  --primary-accent: #1e3a8a; /* A deep blue */
-  --primary-accent-inverse: #e0f2fe; /* A light contrasting blue */
-
-  accent-color: var(--primary-accent);
-  accent-color-inverse: var(--primary-accent-inverse);
-}
-
-button {
-  background-color: accent-color(var(--primary-accent));
-  color: accent-color-inverse(var(--primary-accent-inverse));
+  accent-color: rebeccapurple;
 }
 ```
 
-In this example, the buttons will adopt the deep blue as their primary color, while text on these buttons will be set to a complementary light blue to ensure high contrast and accessibility.
+The browser remains responsible for rendering the control and maintaining legibility. It may adjust the supplied colour or related foreground colours to preserve contrast. Authors should therefore not assume exact cross-platform rendering.
 
-The utility of `accent-color-inverse` lies in its ability to streamline the design process, reducing the need to manually calculate and specify contrasting colors. This can significantly speed up the workflow when creating components that need to dynamically adapt to different color themes.
-
-Nonetheless, as with many cutting-edge CSS features, there are caveats when considering browser support. As of October 2023, `accent-color-inverse` has limited support and may not yet be available in all browsers. Therefore, developers should employ feature detection and consider utilizing a fallback approach to ensure a consistent user experience across all platforms. Polyfills or complementary JavaScript functions can be employed to simulate similar behavior until full browser support becomes widespread.
-
-In conclusion, while `accent-color-inverse` is still finding its footing, its potential for simplifying color contrast management positions it as a valuable tool for modern web development. Stay updated on browser support to take full advantage of this functionality as it gains traction in the web community.
+Further reading: [CSS Basic User Interface Module Level 4](https://www.w3.org/TR/css-ui-4/#widget-accent).

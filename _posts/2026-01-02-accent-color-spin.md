@@ -6,31 +6,18 @@ tags: [accent-color-spin]
 layout: single
 ---
 
-Introduced in late 2023, the CSS property `accent-color-spin` expands the styling toolkit for web developers, enabling more engaging and interactive designs. This feature allows developers to apply a dynamic twist to accent colors on web elements, offering users a more visually appealing experience.
+> **Correction — 1 August 2026:** The original version of this article described `accent-color-spin` as a CSS feature. That was incorrect, so the erroneous article has been replaced.
 
-The `accent-color-spin` property provides a way to animate or alter the hue of accent colors, such as those applied to checkboxes, radio buttons, and selects. By rotating the color value on the color wheel, this property creates a subtle yet effective animation or state change that enhances the overall user experience. It's particularly handy for hover effects, active states, or thematic transitions.
+CSS defines the [`accent-color`](https://www.w3.org/TR/css-ui-4/#widget-accent) property; it does not define a separate `accent-color-spin` property, function, selector, or media query.
 
-Here's an example of how `accent-color-spin` can be used in practice:
+The valid syntax is `accent-color: auto` or `accent-color: <color>`. It lets a browser use the chosen colour for accented parts of applicable user-interface controls, such as checkboxes and radio buttons:
 
 ```css
-/* Base accent color */
-body {
-  accent-color: #0078d4; /* Assuming a base color of blue */
-}
-
-input[type="checkbox"]:hover {
-  accent-color-spin: 180deg; /* Spins the color half a circle to reach its complementary hue */
-}
-
-input[type="checkbox"]:active {
-  accent-color-spin: 90deg; /* Spins a quarter, providing a quick feedback */
+:root {
+  accent-color: rebeccapurple;
 }
 ```
 
-In this example, hovering over the checkboxes changes their color by spinning it around the hue wheel. An active state offers a different transition, indicating user interaction clearly. This allows designers to maintain a consistent theme while adding interactive feedback that can make a UI feel more responsive.
+The browser remains responsible for rendering the control and maintaining legibility. It may adjust the supplied colour or related foreground colours to preserve contrast. Authors should therefore not assume exact cross-platform rendering.
 
-The inclusion of `accent-color-spin` in the modern CSS arsenal is a boon for enhancing user interactions. In an age where user engagement is critical, providing visual cues through well-designed interactions can lead to improved user satisfaction and usability. Not only does `accent-color-spin` allow for vibrant transitions that attract attention, but it also reduces the dependency on JavaScript for such effects, thus optimizing performance and simplicity in your code.
-
-However, the use of `accent-color-spin` does come with caveats regarding browser support. As with many cutting-edge CSS features, full compatibility across all browsers may not be immediately available. Currently, the latest versions of major browsers like Chrome and Firefox are expected to support this feature, but developers should verify compatibility for their specific audience, particularly if they rely heavily on mobile or less common browsers. As always, using feature queries or fallbacks can help maintain functionality for all users.
-
-Ultimately, `accent-color-spin` is a promising addition that empowers developers to craft more visually dynamic web experiences. By understanding its capabilities and limitations, you can stay ahead in delivering engaging and interactive designs that resonate with modern users.
+Further reading: [CSS Basic User Interface Module Level 4](https://www.w3.org/TR/css-ui-4/#widget-accent).
